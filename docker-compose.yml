@@ -1,0 +1,134 @@
+services:
+  db:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - .env:/docker-entrypoint-initdb.d/.env
+      - .env.keycloak:/docker-entrypoint-initdb.d/.env.keycloak
+    env_file:
+      - .env
+      - .env.keycloak
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${API_DB_USER}:${API_DB_PASSWORD}@db:5432/${API_DB_NAME}
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - internal
+      - external
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+# TODO: error en healthchecks a partir de version 25.0.0, cambiar version?
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.2
+    container_name: keycloak
+    command: ["start"]
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.keycloak
+    environment:
+      - PROXY_ADDRESS_FORWARDING=true
+      - KEYCLOAK_HOSTNAME_STRICT=true
+      - KEYCLOAK_HOSTNAME_STRICT_HTTPS=true
+    networks:
+      - internal
+      - external
+
+  pgadmin:
+    build:
+      context: .
+      dockerfile: Dockerfile.pgadmin
+    env_file:
+      - .env
+    environment:
+      - PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION=False
+      - PGADMIN_CONFIG_WTF_CSRF_TIME_LIMIT=None
+      - PGADMIN_CONFIG_WTF_CSRF_SSL_STRICT=False
+      - PGADMIN_CONFIG_CONSOLE_LOG_LEVEL=10
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - ./pgadmin-entrypoint.sh:/pgadmin-entrypoint.sh
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - internal
+      - external
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    command: ["pytest", "tests"]
+    depends_on:
+      db:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    volumes:
+      - ./:/usr/src/app
+    environment:
+      - PYTHONPATH=/usr/src/app
+      - DATABASE_URL=postgresql://${API_DB_USER}:${API_DB_PASSWORD}@db:5432/${API_DB_NAME}
+    profiles:
+      - test
+    networks:
+      - internal
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+      - ./web:/usr/share/nginx/html
+      - ./app/static:/var/www/static
+    depends_on:
+      - api
+      - keycloak
+    networks:
+      - internal
+      - external
+
+volumes:
+  postgres_data:
+  pgadmin-data:
+
+networks:
+  internal:
+    driver: bridge
+  external:
+    driver: bridge

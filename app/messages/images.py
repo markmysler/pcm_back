@@ -1,0 +1,8 @@
+invalid_extension="Invalid file extension. Must be .jpg, .jpeg, .png, or .webp"
+invalid_file="File must be an image (jpeg, png, jpg, webp)."
+invalid_size="File size must be less than 15 MB. Please send a smaller image."
+invalid_error="Unable to identify image file. Please ensure it's a valid image."
+opening_error="Error opening image file."
+removing_error="Failed to remove existing file."
+unexpected_error="An unexpected error occurred."
+sanitizing_error="Error sanitizing string"

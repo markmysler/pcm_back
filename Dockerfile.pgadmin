@@ -1,0 +1,15 @@
+FROM dpage/pgadmin4:latest
+
+USER root
+COPY pgadmin-entrypoint.sh /pgadmin-entrypoint.sh
+COPY servers.template.json /pgadmin4/servers.template.json
+
+RUN chmod +x /pgadmin-entrypoint.sh && \
+    chmod 666 /pgadmin4/servers.template.json && \
+    mkdir -p /pgadmin4 && \
+    chmod 777 /pgadmin4 && \
+    apk update && apk add gettext
+
+USER pgadmin
+
+ENTRYPOINT ["/bin/sh", "/pgadmin-entrypoint.sh"]
