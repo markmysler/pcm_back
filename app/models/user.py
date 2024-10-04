@@ -1,5 +1,6 @@
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy import Column, String, Boolean, Enum, Integer, ForeignKey
 from app.core.database import Base
+from app.enums.roles import UserRole
 
 
 class User(Base):
@@ -12,3 +13,5 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     is_verified = Column(Boolean, default=False)
     avatar = Column(String, nullable=True)
+    organization = Column(Integer, ForeignKey('organizations.id'), nullable=False)  # Foreign key column
+    role = Column(Enum(UserRole), default=UserRole.USER, nullable=False)

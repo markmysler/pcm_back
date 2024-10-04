@@ -29,16 +29,16 @@ load_dotenv(dotenv_path=".env.keycloak")
 
 keycloak_openid = KeycloakOpenID(
     server_url=os.getenv("KC_URL","http://keycloak:8080"),
-    client_id=os.getenv("KC_CLIENT_ID","iconic-api-client"),
-    realm_name=os.getenv("KC_REALM","iconic-api"),
+    client_id=os.getenv("KC_CLIENT_ID","pcm-api-client"),
+    realm_name=os.getenv("KC_REALM","pcm-api"),
     client_secret_key=os.getenv("KC_CLIENT_SECRET","my_precious")
 )
 
 keycloak_connection = KeycloakOpenIDConnection(
     server_url=os.getenv("KC_URL", "http://keycloak:8080"),
-    username=os.getenv("KEYCLOAK_REALM_ADMIN", "iconic-admin"),
+    username=os.getenv("KEYCLOAK_REALM_ADMIN", "pcm-admin"),
     password=os.getenv("KEYCLOAK_REALM_ADMIN_PASSWORD","admin_password"),
-    realm_name=os.getenv("KC_REALM", "iconic-api"),
+    realm_name=os.getenv("KC_REALM", "pcm-api"),
     verify=True
 )
 keycloak_admin = KeycloakAdmin(connection=keycloak_connection)

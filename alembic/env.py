@@ -1,6 +1,6 @@
 from logging.config import fileConfig
 from alembic import context
-from app.models import Base, User
+from app.models import Base, User, Organization
 from app.core.database import engine, DATABASE_URL
 import logging
 

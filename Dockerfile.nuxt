@@ -1,0 +1,16 @@
+# Stage 1: Build the project
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+
+# Stage 2: Serve the app with Node.js
+FROM node:18-alpine
+
+WORKDIR /app
+COPY --from=builder /app/.output /app/.output
+EXPOSE 3000
+
+CMD ["node", ".output/server/index.mjs"]

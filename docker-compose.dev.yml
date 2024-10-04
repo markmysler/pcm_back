@@ -120,6 +120,18 @@ services:
     networks:
       - internal
       - external
+  
+  nuxt:
+    build:
+      context: ./nuxt
+      dockerfile: ../Dockerfile.nuxt
+    ports:
+      - "3000:3000"
+    environment:
+      NUXT_PUBLIC_API_URL: localhost:3000
+    networks:
+      - internal
+      - external
 
 volumes:
   postgres_data:
