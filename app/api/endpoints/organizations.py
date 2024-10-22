@@ -28,7 +28,7 @@ async def create_organization(
         # crear organizacion con args
         new_org = Organization(
             name=org.name,
-            manager=org.manager
+            logo=org.logo
         )
         db.add(new_org)
         db.commit()
