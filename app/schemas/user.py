@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, field_validator, ConfigDict
-
+from app.enums.roles import UserRole
+from typing import Optional
 
 class UserCreate(BaseModel):
     name: str
@@ -7,6 +8,8 @@ class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: str
+    organization: Optional[int] = None
+    role: Optional[UserRole] = None
 
     @field_validator("password")
     def validate_password(cls, v):
@@ -27,6 +30,8 @@ class UserOut(BaseModel):
     username: str
     email: EmailStr
     is_verified: bool
+    organization: int
+    role: UserRole
 
     model_config = ConfigDict(
         from_attributes=True,

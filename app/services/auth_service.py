@@ -31,7 +31,9 @@ def register_user(user: UserCreate, db: Session):
         surname=user.surname,
         username=user.username,
         email=user.email,
-        is_verified=False
+        is_verified=False,
+        organization=user.organization,
+        role=user.role
     )
     db.add(new_db_user)
     db.commit()

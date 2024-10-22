@@ -7,5 +7,4 @@ class Organization(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    manager = Column(String, ForeignKey('users.id'), nullable=False)  # Foreign key column
     logo = Column(String, nullable=True)

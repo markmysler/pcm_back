@@ -112,3 +112,19 @@ def sanitize_filename(filename):
         return filename
     except Exception as e:
         raise HTTPException(status_code=500, detail=msg.sanitizing_error)
+    
+async def delete_image_by_url(url: str):
+    # Assuming that the URL contains the relative path to the file on the server.
+    # Extract the file path from the URL. Adjust this based on your actual URL structure.
+    file_path = url.replace(base_url, "app/") 
+    print(file_path)
+    # Check if the file exists
+    if os.path.exists(file_path):
+        try:
+            # Remove the file
+            os.remove(file_path)
+            return {"message": "Image deleted successfully"}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error deleting the image: {str(e)}")
+    else:
+        raise HTTPException(status_code=404, detail="Image not found")
