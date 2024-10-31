@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException,status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.services import auth_service
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, TokenRequest
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from app.core.config import keycloak_openid
 import app.messages.register as msg
+from pydantic import EmailStr
 
 router = APIRouter()
 
@@ -25,6 +26,13 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
             raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/token")
-def get_token(email:str, password:str):
-    token = keycloak_openid.token(email, password)
-    return token
+def get_token(data: TokenRequest):
+    try:
+        token = keycloak_openid.token(data.email, data.password)
+        return token
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

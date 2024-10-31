@@ -43,3 +43,7 @@ class UserOut(BaseModel):
 class VerificationRequest(BaseModel):
     user_id: str
     verification_code: str
+    
+class TokenRequest(BaseModel):
+    email: EmailStr
+    password: str
