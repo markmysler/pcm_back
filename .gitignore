@@ -96,3 +96,8 @@ certs/
 alembic/versions/*
 
 app/static/*
+
+# Local development files
+start.sh
+restart.sh
+stop.sh
