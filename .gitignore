@@ -97,7 +97,10 @@ alembic/versions/*
 
 app/static/*
 
-# Local development files
+# Local development scripts
 start.sh
 restart.sh
 stop.sh
+
+# Server utility scripts
+update.sh

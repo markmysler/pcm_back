@@ -45,5 +45,5 @@ class VerificationRequest(BaseModel):
     verification_code: str
     
 class TokenRequest(BaseModel):
-    email: EmailStr
+    username: str
     password: str
