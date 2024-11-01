@@ -37,11 +37,10 @@ def get_token(data: TokenRequest):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-@router.post("/reset-password")
-def reset_password(username:str):
+@router.post("/forgot-password")
+def forgot_password(username:str):
     # Trigger a password reset email
     try:
-    # Get the user ID for the given email or username
         user_id = keycloak_admin.get_user_id(username)
     
     # Send a password reset email
