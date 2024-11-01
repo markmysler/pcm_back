@@ -28,7 +28,7 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.post("/token")
 def get_token(data: TokenRequest):
     try:
-        token = keycloak_openid.token(data.email, data.password)
+        token = keycloak_openid.token(data.username, data.password)
         return token
     except Exception as e:
         raise HTTPException(
