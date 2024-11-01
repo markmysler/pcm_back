@@ -5,7 +5,7 @@ from app.services import auth_service
 from app.schemas.user import UserCreate, TokenRequest
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from app.core.config import keycloak_openid
+from app.core.config import keycloak_openid, keycloak_admin
 import app.messages.register as msg
 from pydantic import EmailStr
 
@@ -36,3 +36,16 @@ def get_token(data: TokenRequest):
             detail="Invalid credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+@router.post("/reset-password")
+def reset_password(email:str):
+    # Trigger a password reset email
+    try:
+    # Get the user ID for the given email or username
+        user_id = keycloak_admin.get_user_id(email)
+    
+    # Send a password reset email
+        keycloak_admin.send_update_account(user_id, ["UPDATE_PASSWORD"])
+        return JSONResponse(content="Password reset email sent successfully.", status_code=200)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to send password reset email: {str(e)}")
